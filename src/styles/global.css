@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #050508;
+  --color-bg-2: #0a0a12;
+  --color-surface: #0f0f1a;
+  --color-surface-2: #141420;
+  --color-cyan: #00FFFF;
+  --color-magenta: #FF00FF;
+  --color-gold: #FFD700;
+  --color-white: #F0F0F0;
+  --color-muted: #6b6b80;
+  --color-border: rgba(255,255,255,0.07);
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  /* Lenis smooth scroll target */
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: var(--color-bg);
+  overscroll-behavior: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-cyan); border-radius: 2px; }
+
+/* Hide default cursor — custom cursor replaces it */
+* { cursor: none !important; }
+
+/* Lenis class applied to html */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  * { cursor: auto !important; }
+  .custom-cursor { display: none !important; }
+}
+
+/* Utility classes */
+.neon-cyan { color: var(--color-cyan); }
+.neon-magenta { color: var(--color-magenta); }
+.neon-gold { color: var(--color-gold); }
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), 0 0 60px rgba(0, 255, 255, 0.15);
+}
+.glow-magenta {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.4), 0 0 60px rgba(255, 0, 255, 0.15);
+}
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.15);
+}
+
+.text-glow-cyan { text-shadow: 0 0 20px rgba(0,255,255,0.6), 0 0 60px rgba(0,255,255,0.3); }
+.text-glow-magenta { text-shadow: 0 0 20px rgba(255,0,255,0.6), 0 0 60px rgba(255,0,255,0.3); }
+.text-glow-gold { text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3); }
+
+/* Section base */
+.section {
+  position: relative;
+  overflow: hidden;
+}
