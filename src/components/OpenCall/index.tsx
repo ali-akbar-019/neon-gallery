@@ -92,7 +92,7 @@ export default function OpenCall() {
       id="open-call"
       ref={sectionRef}
       style={{
-        padding: 'clamp(5rem, 10vw, 8rem) clamp(2rem, 6vw, 6rem)',
+        padding: 'var(--section-py) var(--section-px)',
         background: 'var(--color-bg)',
         position: 'relative',
         overflow: 'hidden',
@@ -114,8 +114,7 @@ export default function OpenCall() {
           Open Call — 2025
         </p>
         <h2 ref={headingRef} style={{
-          fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-          letterSpacing: '0.04em', color: 'var(--color-white)', lineHeight: 1, opacity: 0,
+          color: 'var(--color-white)', opacity: 0,
         }}>
           Submit Your Work
         </h2>

@@ -165,30 +165,19 @@ export default function GalleryGrid() {
       id="gallery"
       ref={sectionRef}
       style={{
-        padding: 'clamp(5rem, 10vw, 8rem) clamp(2rem, 6vw, 6rem)',
+        padding: 'var(--section-py) var(--section-px)',
         background: 'var(--color-bg-2)',
       }}
     >
       {/* Section header */}
-      <div style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
-        <p style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.65rem',
-          letterSpacing: '0.25em',
-          color: 'var(--color-magenta)',
-          textTransform: 'uppercase',
-          marginBottom: '1rem',
-        }}>
+      <div style={{ marginBottom: 'var(--space-xl)' }}>
+        <p className="label" style={{ color: 'var(--color-magenta)', marginBottom: 'var(--space-sm)' }}>
           Permanent Collection
         </p>
         <h2
           ref={headingRef}
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-            letterSpacing: '0.04em',
             color: 'var(--color-white)',
-            lineHeight: 1,
             opacity: 0,
           }}
         >
@@ -200,8 +189,8 @@ export default function GalleryGrid() {
       <div
         style={{
           columns: 'clamp(280px, 30vw, 380px) 3',
-          columnGap: '1.5rem',
-          rowGap: '1.5rem',
+          columnGap: 'var(--space-md)',
+          rowGap: 'var(--space-md)',
         }}
       >
         {artworks.map((artwork, i) => (

@@ -94,11 +94,11 @@ export default function FeaturedExhibition() {
       id="featured"
       ref={sectionRef}
       style={{
-        padding: 'clamp(6rem, 12vw, 10rem) clamp(2rem, 8vw, 8rem)',
+        padding: 'var(--section-py) var(--section-px)',
         background: 'var(--color-bg)',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: 'clamp(3rem, 6vw, 6rem)',
+        gap: 'clamp(3rem, 6vw, 7rem)',
         alignItems: 'center',
       }}
     >
@@ -156,17 +156,14 @@ export default function FeaturedExhibition() {
       </div>
 
       {/* Content */}
-      <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         <div>
           <p
             ref={eyebrowRef}
+            className="label"
             style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              letterSpacing: '0.25em',
               color: 'var(--color-cyan)',
-              textTransform: 'uppercase',
-              marginBottom: '1rem',
+              marginBottom: 'var(--space-sm)',
               opacity: 0,
             }}
           >
@@ -175,10 +172,6 @@ export default function FeaturedExhibition() {
           <h2
             ref={titleRef}
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-              lineHeight: 1,
-              letterSpacing: '0.03em',
               color: 'var(--color-white)',
               opacity: 0,
             }}
@@ -189,11 +182,8 @@ export default function FeaturedExhibition() {
 
         <p
           ref={descRef}
+          className="body-lg"
           style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '1rem',
-            lineHeight: 1.8,
-            color: 'rgba(240,240,240,0.5)',
             maxWidth: 480,
             opacity: 0,
           }}

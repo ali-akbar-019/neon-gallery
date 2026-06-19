@@ -115,7 +115,7 @@ export default function Timeline() {
       id="timeline"
       ref={sectionRef}
       style={{
-        padding: 'clamp(5rem, 10vw, 8rem) clamp(2rem, 6vw, 6rem)',
+        padding: 'var(--section-py) var(--section-px)',
         background: 'var(--color-bg-2)',
         position: 'relative',
         overflow: 'hidden',
@@ -137,8 +137,7 @@ export default function Timeline() {
           Exhibition History
         </p>
         <h2 ref={headingRef} style={{
-          fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-          letterSpacing: '0.04em', color: 'var(--color-white)', lineHeight: 1, opacity: 0,
+          color: 'var(--color-white)', opacity: 0,
         }}>
           The Record
         </h2>

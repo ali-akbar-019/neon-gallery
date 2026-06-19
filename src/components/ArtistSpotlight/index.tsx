@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { artists } from '../../data/artists';
@@ -39,16 +39,18 @@ function CountUp({ target, duration = 1.4 }: { target: number; duration?: number
 }
 
 export default function ArtistSpotlight() {
-  const wrapRef = useRef<HTMLDivElement>(null);   // the outer wrapper we pin
-  const trackRef = useRef<HTMLDivElement>(null);  // the sliding row of cards
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const eyebrowRef = useRef<HTMLParagraphElement>(null);
-  const stRef = useRef<ScrollTrigger | null>(null);
+  const wrapRef     = useRef<HTMLDivElement>(null);   // pinned viewport
+  const trackRef    = useRef<HTMLDivElement>(null);   // sliding row
+  const headingRef  = useRef<HTMLHeadingElement>(null);
+  const eyebrowRef  = useRef<HTMLParagraphElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);   // mini progress bar inside the pin
 
-  useEffect(() => {
+  // useLayoutEffect so ScrollTrigger is set up AFTER the DOM has its final
+  // layout, but BEFORE the browser paints — avoids any visible "jump" or
+  // "snap" when the pin engages.
+  useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Heading entrance
     gsap.fromTo([eyebrowRef.current, headingRef.current],
       { y: 35, opacity: 0 },
       {
@@ -59,84 +61,79 @@ export default function ArtistSpotlight() {
 
     if (prefersReducedMotion) return;
 
-    // Wait a tick so layout is fully painted and scrollWidth is accurate
-    const setupST = () => {
-      const wrap = wrapRef.current;
+    let st: ScrollTrigger | undefined;
+    let raf = 0;
+
+    const build = () => {
+      const wrap  = wrapRef.current;
       const track = trackRef.current;
       if (!wrap || !track) return;
 
-      // Kill any previous instance
-      stRef.current?.kill();
+      st?.kill();
 
-      const trackW = track.scrollWidth;
-      const viewW  = wrap.offsetWidth;
-      const dist   = trackW - viewW;          // total px to slide
+      const dist = track.scrollWidth - wrap.offsetWidth;
+      if (dist <= 0) return;
 
-      if (dist <= 0) return;                  // nothing to scroll
+      // tween drives both the track's x position AND a quickTo-style
+      // tracked value, so motion is interpolated smoothly by GSAP itself
+      // rather than being set frame-by-frame from raw scroll progress.
+      // This is what removes the "snap/attach" feeling — the position is
+      // tweened with inertia (scrub value), not hard-set.
+      const xTo = gsap.quickTo(track, 'x', { duration: 0.5, ease: 'power3.out' });
+      const progressTo = progressRef.current
+        ? gsap.quickTo(progressRef.current, 'scaleX', { duration: 0.5, ease: 'power3.out' })
+        : null;
 
-      stRef.current = ScrollTrigger.create({
+      st = ScrollTrigger.create({
         trigger: wrap,
         start: 'top top',
-        // pin travels exactly as far as the cards need to slide, plus a short breathe
-        end: () => `+=${dist + 80}`,
+        end: () => `+=${dist + window.innerHeight * 0.15}`,
         pin: true,
-        scrub: 1.2,
+        // A gentle scrub value (not "true") adds inertia/lag so the
+        // horizontal motion always feels like it's catching up smoothly,
+        // never a 1:1 hard jump.
+        scrub: 0.6,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          gsap.set(track, { x: -dist * self.progress });
+          xTo(-dist * self.progress);
+          progressTo?.(Math.max(0.02, self.progress));
         },
       });
     };
 
-    // Small RAF delay lets images begin loading so layout settles
-    const id = requestAnimationFrame(() => setTimeout(setupST, 120));
+    // Defer until images have a chance to lay out — prevents wrong
+    // scrollWidth measurement which was the root cause of the old bug.
+    raf = requestAnimationFrame(() => {
+      // double RAF: first lets React commit, second lets browser paint/layout
+      requestAnimationFrame(() => setTimeout(build, 60));
+    });
 
-    // Also refresh if window resizes
-    const onResize = () => { ScrollTrigger.refresh(); };
+    const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', onResize);
 
     return () => {
-      cancelAnimationFrame(id);
-      stRef.current?.kill();
+      cancelAnimationFrame(raf);
+      st?.kill();
       window.removeEventListener('resize', onResize);
     };
   }, []);
 
   return (
-    <section
-      id="artists"
-      style={{ background: 'var(--color-bg)', position: 'relative' }}
-    >
-      {/* ── Heading (scrolls normally, NOT pinned) ──────────────────────── */}
-      <div style={{
-        padding: 'clamp(5rem, 10vw, 8rem) clamp(2rem, 6vw, 6rem) 2.5rem',
-      }}>
-        <p ref={eyebrowRef} style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.65rem',
-          letterSpacing: '0.25em',
-          color: 'var(--color-gold)',
-          textTransform: 'uppercase',
-          marginBottom: '0.9rem',
-          opacity: 0,
+    <section id="artists" style={{ background: 'var(--color-bg)', position: 'relative' }}>
+      {/* Heading — scrolls normally */}
+      <div style={{ padding: 'var(--section-py) var(--section-px) var(--space-lg)' }}>
+        <p ref={eyebrowRef} className="label" style={{
+          color: 'var(--color-gold)', marginBottom: 'var(--space-sm)', opacity: 0,
         }}>
           Contributing Artists
         </p>
-        <h2 ref={headingRef} style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-          letterSpacing: '0.04em',
-          color: 'var(--color-white)',
-          lineHeight: 1,
-          opacity: 0,
-        }}>
+        <h2 ref={headingRef} style={{ color: 'var(--color-white)', opacity: 0 }}>
           The Makers
         </h2>
       </div>
 
-      {/* ── Pinned horizontal-scroll wrapper ────────────────────────────── */}
-      {/* NOTE: NO overflow:hidden here — that breaks GSAP pin spacer */}
+      {/* Pinned horizontal-scroll viewport */}
       <div
         ref={wrapRef}
         style={{
@@ -145,39 +142,40 @@ export default function ArtistSpotlight() {
           display: 'flex',
           alignItems: 'center',
           background: 'var(--color-bg)',
-          willChange: 'transform',
+          position: 'relative',
         }}
       >
+        {/* Progress indicator — shows how far through the artist set we are */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+          background: 'var(--color-border)', zIndex: 5,
+        }}>
+          <div
+            ref={progressRef}
+            style={{
+              width: '100%', height: '100%', transformOrigin: 'left center', transform: 'scaleX(0)',
+              background: 'linear-gradient(90deg, var(--color-gold), var(--color-magenta))',
+              boxShadow: '0 0 10px rgba(255,215,0,0.5)',
+            }}
+          />
+        </div>
+
         {/* Scroll hint */}
         <div style={{
-          position: 'absolute',
-          bottom: '2rem',
-          right: 'clamp(2rem, 6vw, 6rem)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.6rem',
-          opacity: 0.35,
-          pointerEvents: 'none',
+          position: 'absolute', bottom: 'var(--space-md)', right: 'var(--section-px)',
+          display: 'flex', alignItems: 'center', gap: '0.6rem', opacity: 0.35, pointerEvents: 'none',
         }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.55rem',
-            letterSpacing: '0.2em',
-            color: 'var(--color-white)',
-            textTransform: 'uppercase',
-          }}>
-            Scroll to explore
-          </span>
+          <span className="label" style={{ color: 'var(--color-white)' }}>Scroll to explore</span>
           <span style={{ color: 'var(--color-gold)', fontSize: '0.8rem' }}>→</span>
         </div>
 
-        {/* Track — slides left via gsap.set in onUpdate */}
+        {/* Track */}
         <div
           ref={trackRef}
           style={{
             display: 'flex',
-            gap: '2rem',
-            padding: '0 clamp(2rem, 6vw, 6rem)',
+            gap: 'var(--space-md)',
+            padding: `0 var(--section-px)`,
             willChange: 'transform',
           }}
         >
@@ -213,16 +211,14 @@ export default function ArtistSpotlight() {
                   <img
                     src={artist.imageUrl}
                     alt={artist.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <div style={{
                     position: 'absolute', inset: 0,
                     background: 'linear-gradient(to top, var(--color-surface) 0%, transparent 55%)',
                   }} />
-                  {/* Neon accent corner stripe */}
                   <div style={{
-                    position: 'absolute', top: 0, left: 0, right: 0,
-                    height: 3,
+                    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
                     background: `linear-gradient(90deg, ${accent}, transparent)`,
                     boxShadow: `0 0 12px ${accent}`,
                   }} />
@@ -243,26 +239,21 @@ export default function ArtistSpotlight() {
                   <p style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
                     letterSpacing: '0.15em', color: accent,
-                    textTransform: 'uppercase', marginBottom: '0.4rem',
+                    textTransform: 'uppercase', marginBottom: '0.5rem',
                   }}>
                     {artist.specialty}
                   </p>
-                  <h3 style={{
-                    fontFamily: 'var(--font-display)', fontSize: '2rem',
-                    letterSpacing: '0.04em', color: 'var(--color-white)',
-                    lineHeight: 1, marginBottom: '0.9rem',
-                  }}>
+                  <h3 style={{ color: 'var(--color-white)', marginBottom: '0.9rem' }}>
                     {artist.name}
                   </h3>
                   <p style={{
-                    fontFamily: 'var(--font-body)', fontSize: '0.83rem',
-                    lineHeight: 1.75, color: 'rgba(240,240,240,0.42)',
+                    fontFamily: 'var(--font-body)', fontSize: '0.85rem',
+                    lineHeight: 1.75, color: 'rgba(239,239,239,0.42)',
                     marginBottom: '1.5rem',
                   }}>
                     {artist.bio}
                   </p>
 
-                  {/* Stats */}
                   <div style={{
                     display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
                     gap: '0.5rem', paddingTop: '1.25rem',
