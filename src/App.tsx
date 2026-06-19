@@ -11,7 +11,9 @@ import FeaturedExhibition from './components/FeaturedExhibition';
 import GalleryGrid from './components/GalleryGrid';
 import ArtistSpotlight from './components/ArtistSpotlight';
 import Stats from './components/Stats';
+import Timeline from './components/Timeline';
 import Quote from './components/Quote';
+import OpenCall from './components/OpenCall';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -29,7 +31,9 @@ export default function App() {
         <GalleryGrid />
         <ArtistSpotlight />
         <Stats />
+        <Timeline />
         <Quote />
+        <OpenCall />
         <Footer />
       </main>
     </>
