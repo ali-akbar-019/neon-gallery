@@ -16,7 +16,9 @@ export default function FeaturedExhibition() {
 
   const artwork = featuredArtwork;
 
-  // 3D card tilt effect
+  // Gentle 3D tilt — like leaning in to examine a piece up close.
+  // Kept subtle (max ~6deg) so it reads as a considered interaction,
+  // not a flashy effect.
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = imageRef.current;
     if (!card) return;
@@ -25,25 +27,14 @@ export default function FeaturedExhibition() {
     const y = e.clientY - rect.top;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const rotateX = ((y - cy) / cy) * -10;
-    const rotateY = ((x - cx) / cx) * 10;
+    const rotateX = ((y - cy) / cy) * -5;
+    const rotateY = ((x - cx) / cx) * 5;
 
-    gsap.to(card, {
-      rotateX,
-      rotateY,
-      transformPerspective: 1000,
-      duration: 0.4,
-      ease: 'power2.out',
-    });
+    gsap.to(card, { rotateX, rotateY, transformPerspective: 1200, duration: 0.5, ease: 'power2.out' });
   };
 
   const handleMouseLeave = () => {
-    gsap.to(imageRef.current, {
-      rotateX: 0,
-      rotateY: 0,
-      duration: 0.6,
-      ease: 'elastic.out(1, 0.5)',
-    });
+    gsap.to(imageRef.current, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power3.out' });
   };
 
   useEffect(() => {
@@ -51,39 +42,16 @@ export default function FeaturedExhibition() {
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      // Image parallax on scroll
-      gsap.fromTo(
-        imageRef.current,
-        { yPercent: -8 },
-        {
-          yPercent: 8,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.5,
-          },
-        }
-      );
+      gsap.fromTo(imageRef.current, { yPercent: -6 }, {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: sectionRef.current, start: 'top bottom', end: 'bottom top', scrub: 1.5 },
+      });
 
-      // Content stagger on scroll into view
       const elements = [eyebrowRef.current, titleRef.current, descRef.current, metaRef.current];
-      gsap.fromTo(
-        elements,
-        { y: 50, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          stagger: 0.12,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: contentRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
+      gsap.fromTo(elements, { y: 36, opacity: 0 }, {
+        y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: contentRef.current, start: 'top 80%' },
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -93,63 +61,38 @@ export default function FeaturedExhibition() {
     <section
       id="featured"
       ref={sectionRef}
+      className="section-pad"
       style={{
-        padding: 'var(--section-py) var(--section-px)',
-        background: 'var(--color-bg)',
+        background: 'var(--color-ink)',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         gap: 'clamp(3rem, 6vw, 7rem)',
         alignItems: 'center',
       }}
     >
-      {/* 3D Tilt Image card */}
+      {/* Tilt image card */}
       <div
         ref={imageRef}
-        data-cursor-hover
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
           position: 'relative',
-          borderRadius: 4,
           overflow: 'hidden',
           willChange: 'transform',
-          boxShadow: '0 30px 100px rgba(0,0,0,0.6)',
+          border: '1px solid var(--color-line)',
         }}
       >
         <img
           src={artwork.imageUrl}
           alt={artwork.title}
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'block',
-            objectFit: 'cover',
-            aspectRatio: '4/5',
-          }}
+          style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', aspectRatio: '4/5' }}
         />
-
-        {/* Neon border glow */}
         <div style={{
-          position: 'absolute',
-          inset: 0,
-          boxShadow: 'inset 0 0 0 1px rgba(0,255,255,0.25)',
-          borderRadius: 4,
-          pointerEvents: 'none',
-        }} />
-
-        {/* Corner accent */}
-        <div style={{
-          position: 'absolute',
-          top: '1.5rem',
-          right: '1.5rem',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6rem',
-          letterSpacing: '0.15em',
-          color: 'var(--color-cyan)',
-          background: 'rgba(0,0,0,0.7)',
-          padding: '0.4rem 0.7rem',
-          backdropFilter: 'blur(4px)',
-          border: '1px solid rgba(0,255,255,0.2)',
+          position: 'absolute', top: 'var(--space-sm)', right: 'var(--space-sm)',
+          fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.12em',
+          color: 'var(--color-bone)', background: 'rgba(11,11,12,0.7)',
+          padding: '0.4rem 0.75rem', backdropFilter: 'blur(4px)',
+          border: '1px solid var(--color-line)',
         }}>
           Featured Work
         </div>
@@ -158,36 +101,13 @@ export default function FeaturedExhibition() {
       {/* Content */}
       <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         <div>
-          <p
-            ref={eyebrowRef}
-            className="label"
-            style={{
-              color: 'var(--color-cyan)',
-              marginBottom: 'var(--space-sm)',
-              opacity: 0,
-            }}
-          >
-            Current Exhibition ✦ {artwork.year}
+          <p ref={eyebrowRef} className="label" style={{ color: 'var(--color-rust)', marginBottom: 'var(--space-sm)', opacity: 0 }}>
+            Current Exhibition — {artwork.year}
           </p>
-          <h2
-            ref={titleRef}
-            style={{
-              color: 'var(--color-white)',
-              opacity: 0,
-            }}
-          >
-            {artwork.title}
-          </h2>
+          <h2 ref={titleRef} style={{ opacity: 0 }}>{artwork.title}</h2>
         </div>
 
-        <p
-          ref={descRef}
-          className="body-lg"
-          style={{
-            maxWidth: 480,
-            opacity: 0,
-          }}
-        >
+        <p ref={descRef} className="body-lg" style={{ maxWidth: 480, opacity: 0 }}>
           {artwork.artist} renders an interior that cannot exist in waking life — a space whose
           geometry shifts faster than memory can record it. Each viewing reveals a different architecture.
         </p>
@@ -199,56 +119,35 @@ export default function FeaturedExhibition() {
             { label: 'Dimensions', value: artwork.dimensions },
           ].map(({ label, value }) => (
             <div key={label} style={{
-              display: 'flex',
-              gap: '1.5rem',
-              alignItems: 'center',
-              padding: '0.75rem 0',
-              borderBottom: '1px solid var(--color-border)',
+              display: 'flex', gap: 'var(--space-md)', alignItems: 'center',
+              padding: '0.7rem 0', borderBottom: '1px solid var(--color-line)',
             }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.6rem',
-                letterSpacing: '0.15em',
-                color: 'var(--color-muted)',
-                textTransform: 'uppercase',
-                minWidth: 80,
-              }}>
-                {label}
-              </span>
-              <span style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.9rem',
-                color: 'var(--color-white)',
-              }}>
-                {value}
-              </span>
+              <span className="label" style={{ minWidth: 90 }}>{label}</span>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--color-bone)' }}>{value}</span>
             </div>
           ))}
         </div>
 
         <button
-          data-cursor-hover
           style={{
             alignSelf: 'flex-start',
-            padding: '0.9rem 2.5rem',
-            background: 'var(--color-cyan)',
+            padding: '0.9rem 2.3rem',
+            background: 'var(--color-rust)',
             border: 'none',
-            color: '#050508',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
+            color: 'var(--color-ink)',
+            fontFamily: 'var(--font-body)',
+            fontSize: '0.92rem',
+            fontWeight: 600,
             borderRadius: 2,
-            fontWeight: 700,
-            transition: 'all 0.25s ease',
-            boxShadow: '0 0 30px rgba(0,255,255,0.3)',
+            cursor: 'pointer',
+            transition: 'background 0.25s ease, transform 0.25s ease',
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 50px rgba(0,255,255,0.6)';
+            (e.currentTarget as HTMLButtonElement).style.background = '#DA6440';
             (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 30px rgba(0,255,255,0.3)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-rust)';
             (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
           }}
         >

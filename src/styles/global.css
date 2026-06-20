@@ -1,165 +1,121 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ────────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — "Wall & Bone"
+   A quiet, confident gallery identity. Warm near-black, bone white,
+   a single terracotta accent. Serif display (Fraunces) for personality,
+   Inter for body, JetBrains Mono for meta/labels only.
+   ════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* Colors */
-  --color-bg:        #050508;
-  --color-bg-2:      #08080f;
-  --color-surface:   #0d0d18;
-  --color-surface-2: #121220;
-  --color-cyan:      #00FFFF;
-  --color-magenta:   #FF00FF;
-  --color-gold:      #FFD700;
-  --color-white:     #EFEFEF;
-  --color-muted:     #52526a;
-  --color-border:    rgba(255,255,255,0.06);
+  /* — Color: 5 named values, one accent, used with restraint — */
+  --color-ink:      #0B0B0C;  /* page background — warm near-black */
+  --color-surface:  #161513;  /* card / panel surface */
+  --color-surface-2:#1F1D1A;  /* slightly raised surface */
+  --color-bone:     #F5F3EE;  /* primary text / inverse background */
+  --color-clay:     #8A8578;  /* muted text */
+  --color-rust:     #C8542F;  /* the one accent — terracotta */
+  --color-rust-dim: #8A3B22;  /* accent at lower emphasis */
+  --color-line:     rgba(245,243,238,0.09); /* hairline borders */
 
-  /* Typography */
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'Space Mono', monospace;
+  /* — Type families — */
+  --font-display: 'Fraunces', serif;
+  --font-body:     'Inter', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
 
-  /* Spacing scale — every section uses these */
-  --space-xs:  0.5rem;
-  --space-sm:  1rem;
-  --space-md:  2rem;
+  /* — Type scale (fluid) — */
+  --t-display-xl: clamp(3.2rem, 8vw, 7.5rem);   /* hero headline */
+  --t-display-lg: clamp(2.4rem, 5vw, 4.2rem);   /* section headings */
+  --t-display-md: clamp(1.5rem, 2.4vw, 2rem);   /* card titles */
+  --t-body-lg:     clamp(1.05rem, 1.4vw, 1.2rem);
+  --t-body-md:      0.95rem;
+  --t-label:        0.7rem;
+
+  /* — Spacing rhythm — */
+  --space-2xs: 0.4rem;
+  --space-xs:  0.75rem;
+  --space-sm:  1.25rem;
+  --space-md:  2.25rem;
   --space-lg:  4rem;
   --space-xl:  7rem;
-  --space-2xl: 11rem;
+  --space-2xl: 10rem;
 
-  /* Section padding — consistent across all sections */
-  --section-px: clamp(2rem, 7vw, 7rem);
-  --section-py: clamp(5rem, 10vw, 9rem);
+  --section-px: clamp(1.5rem, 6vw, 6rem);
+  --section-py: clamp(4.5rem, 9vw, 8rem);
 
-  /* Easing */
-  --ease-expo:  cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ─── Reset ─────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-  background-color: var(--color-bg);
-  color: var(--color-white);
+  background: var(--color-ink);
+  color: var(--color-bone);
   font-family: var(--font-body);
   overflow-x: hidden;
-  scroll-behavior: auto;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: var(--color-bg);
-  overscroll-behavior: none;
+  background: var(--color-ink);
   font-size: 16px;
   line-height: 1.6;
+  overscroll-behavior: none;
 }
 
 img { display: block; max-width: 100%; }
-button { cursor: none; }
 
-/* ─── Typography scale ──────────────────────────────────────────────────────── */
-/*
-  Display headings use Bebas Neue — very large, tight tracking, condensed.
-  Body uses DM Sans at generous line-height.
-  Labels / eyebrows use Space Mono, small, wide tracking, uppercase.
-
-  Scale (fluid clamp):
-    --t-display-xl : hero h1  → 9rem → 14rem
-    --t-display-lg : section h2 → 4.5rem → 7.5rem
-    --t-display-md : card h3  → 2rem → 3rem
-    --t-body-lg    : lead paragraph → 1.15rem → 1.35rem
-    --t-body-md    : body → 0.9rem → 1rem
-    --t-label      : eyebrow / mono label → 0.62rem
-*/
-:root {
-  --t-display-xl: clamp(6rem,  14vw, 13rem);
-  --t-display-lg: clamp(3.5rem, 7vw,  7rem);
-  --t-display-md: clamp(1.8rem, 3vw,  2.8rem);
-  --t-body-lg:    clamp(1.05rem, 1.5vw, 1.25rem);
-  --t-body-md:    clamp(0.88rem, 1.1vw, 1rem);
-  --t-label:      0.62rem;
-}
-
-/* Global heading defaults */
-h1 {
+/* — Headings: Fraunces, optical sizing, restrained weight — */
+h1, h2, h3 {
   font-family: var(--font-display);
-  font-size: var(--t-display-xl);
-  line-height: 0.92;
-  letter-spacing: 0.01em;
-  font-weight: 400;
+  font-weight: 480;
+  font-optical-sizing: auto;
+  color: var(--color-bone);
 }
-
-h2 {
-  font-family: var(--font-display);
-  font-size: var(--t-display-lg);
-  line-height: 0.95;
-  letter-spacing: 0.02em;
-  font-weight: 400;
-}
-
-h3 {
-  font-family: var(--font-display);
-  font-size: var(--t-display-md);
-  line-height: 1.05;
-  letter-spacing: 0.03em;
-  font-weight: 400;
-}
+h1 { font-size: var(--t-display-xl); line-height: 0.98; letter-spacing: -0.01em; }
+h2 { font-size: var(--t-display-lg); line-height: 1.04; letter-spacing: -0.01em; }
+h3 { font-size: var(--t-display-md); line-height: 1.15; }
 
 p { font-family: var(--font-body); }
 
-/* Eyebrow / label class */
 .label {
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  letter-spacing: 0.22em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  line-height: 1;
+  color: var(--color-clay);
 }
 
-/* Lead paragraph */
 .body-lg {
   font-family: var(--font-body);
   font-size: var(--t-body-lg);
-  line-height: 1.85;
-  color: rgba(239,239,239,0.48);
+  line-height: 1.75;
+  color: var(--color-clay);
 }
 
-/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+.accent     { color: var(--color-rust); }
+.bg-surface { background: var(--color-surface); }
+
 ::-webkit-scrollbar       { width: 3px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.4); border-radius: 2px; }
+::-webkit-scrollbar-track { background: var(--color-ink); }
+::-webkit-scrollbar-thumb { background: var(--color-rust); border-radius: 2px; }
 
-/* ─── Cursor ─────────────────────────────────────────────────────────────────── */
-* { cursor: none !important; }
+a { color: inherit; }
+button { font-family: inherit; }
 
-/* ─── Lenis ──────────────────────────────────────────────────────────────────── */
-html.lenis { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-scrolling iframe { pointer-events: none; }
+/* — Focus states (accessibility, not decoration) — */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--color-rust);
+  outline-offset: 2px;
+}
 
-/* ─── Reduced motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration:       0.01ms !important;
-    animation-iteration-count: 1     !important;
-    transition-duration:      0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  * { cursor: auto !important; }
-  .custom-cursor { display: none !important; }
 }
 
-/* ─── Section layout helper ──────────────────────────────────────────────────── */
-.section-pad {
-  padding: var(--section-py) var(--section-px);
-}
-
-/* ─── Divider ────────────────────────────────────────────────────────────────── */
-.divider {
-  width: 100%;
-  height: 1px;
-  background: var(--color-border);
-}
+.section-pad { padding: var(--section-py) var(--section-px); }
+.divider { width: 100%; height: 1px; background: var(--color-line); }

@@ -1,7 +1,6 @@
 import './styles/global.css';
 import { useLenis } from './hooks/useLenis';
 
-import CustomCursor from './components/UI/CustomCursor';
 import ScrollProgress from './components/UI/ScrollProgress';
 import Navbar from './components/UI/Navbar';
 
@@ -21,7 +20,6 @@ export default function App() {
 
   return (
     <>
-      <CustomCursor />
       <ScrollProgress />
       <Navbar />
       <main>
