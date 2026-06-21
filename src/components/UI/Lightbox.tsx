@@ -33,6 +33,7 @@ export default function Lightbox({ artwork, onClose }: LightboxProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={(e) => e.target === overlayRef.current && onClose()}
+          className="lightbox-overlay"
           style={{
             position: 'fixed', inset: 0,
             background: 'rgba(11,11,12,0.94)',
@@ -40,6 +41,7 @@ export default function Lightbox({ artwork, onClose }: LightboxProps) {
             zIndex: 8000,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '2rem',
+            overflowY: 'auto',
           }}
         >
           <motion.div
@@ -47,6 +49,7 @@ export default function Lightbox({ artwork, onClose }: LightboxProps) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.92, opacity: 0, y: 20 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="lightbox-content"
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -55,7 +58,7 @@ export default function Lightbox({ artwork, onClose }: LightboxProps) {
             }}
           >
             {/* Image */}
-            <div style={{ position: 'relative', overflow: 'hidden', border: '1px solid var(--color-line)' }}>
+            <div className="lightbox-image" style={{ position: 'relative', overflow: 'hidden', border: '1px solid var(--color-line)', minWidth: 0 }}>
               <img
                 src={artwork.imageUrl}
                 alt={artwork.title}
@@ -107,6 +110,19 @@ export default function Lightbox({ artwork, onClose }: LightboxProps) {
               </button>
             </div>
           </motion.div>
+
+          {/* Below 760px: stack image above info instead of squeezing two
+              columns, and shrink the overlay's outer padding so the modal
+              has more usable width on phones. */}
+          <style>{`
+            @media (max-width: 760px) {
+              .lightbox-content { grid-template-columns: 1fr !important; max-height: none !important; }
+              .lightbox-image { aspect-ratio: 4/3 !important; }
+            }
+            @media (max-width: 480px) {
+              .lightbox-overlay { padding: 1rem !important; }
+            }
+          `}</style>
         </motion.div>
       )}
     </AnimatePresence>

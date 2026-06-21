@@ -46,6 +46,7 @@ export default function Footer() {
     <footer ref={footerRef} style={{ background: 'var(--color-ink)', borderTop: '1px solid var(--color-line)' }}>
       <div
         ref={contentRef}
+        className="footer-grid"
         style={{
           padding: 'var(--space-2xl) var(--section-px) var(--space-xl)',
           display: 'grid',
@@ -135,6 +136,15 @@ export default function Footer() {
           Built with React + GSAP
         </span>
       </div>
+
+      {/* Below 760px: 3 columns → 1, stacked. Below 480px the bottom bar's
+          two lines (copyright + credit) wrap onto separate lines via
+          flexWrap, already handled above. */}
+      <style>{`
+        @media (max-width: 760px) {
+          .footer-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </footer>
   );
 }

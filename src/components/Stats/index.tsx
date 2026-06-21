@@ -46,16 +46,18 @@ function StatItem({ value, suffix, label, index }: {
   return (
     <div
       ref={ref}
+      className="stat-item"
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
         padding: 'var(--space-lg) var(--space-md)',
         borderRight: '1px solid var(--color-line)',
+        minWidth: 0,
       }}
     >
       <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.8rem, 5.5vw, 4.5rem)', lineHeight: 1, color: 'var(--color-bone)' }}>
         {display}{suffix}
       </div>
-      <div className="label">{label}</div>
+      <div className="label" style={{ textAlign: 'center' }}>{label}</div>
     </div>
   );
 }
@@ -78,11 +80,27 @@ export default function Stats() {
         <p ref={headingRef} className="label" style={{ opacity: 0 }}>By the numbers</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
         {STATS.map((stat, i) => (
           <StatItem key={stat.label} {...stat} index={i} />
         ))}
       </div>
+
+      {/* Below 700px: 4 columns → 2x2 grid. Below 420px: single column.
+          Right borders are removed on whichever item ends each row so
+          there's no dangling border on the last column. */}
+      <style>{`
+        @media (max-width: 700px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .stat-item:nth-child(2n) { border-right: none !important; }
+          .stat-item:nth-child(n+3) { border-top: 1px solid var(--color-line); }
+        }
+        @media (max-width: 420px) {
+          .stats-grid { grid-template-columns: 1fr !important; }
+          .stat-item { border-right: none !important; }
+          .stat-item:not(:first-child) { border-top: 1px solid var(--color-line); }
+        }
+      `}</style>
     </section>
   );
 }

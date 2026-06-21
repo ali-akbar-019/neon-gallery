@@ -61,7 +61,7 @@ export default function FeaturedExhibition() {
     <section
       id="featured"
       ref={sectionRef}
-      className="section-pad"
+      className="section-pad featured-section"
       style={{
         background: 'var(--color-ink)',
         display: 'grid',
@@ -75,11 +75,13 @@ export default function FeaturedExhibition() {
         ref={imageRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        className="featured-image"
         style={{
           position: 'relative',
           overflow: 'hidden',
           willChange: 'transform',
           border: '1px solid var(--color-line)',
+          minWidth: 0,
         }}
       >
         <img
@@ -99,7 +101,7 @@ export default function FeaturedExhibition() {
       </div>
 
       {/* Content */}
-      <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+      <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', minWidth: 0 }}>
         <div>
           <p ref={eyebrowRef} className="label" style={{ color: 'var(--color-rust)', marginBottom: 'var(--space-sm)', opacity: 0 }}>
             Current Exhibition — {artwork.year}
@@ -119,7 +121,7 @@ export default function FeaturedExhibition() {
             { label: 'Dimensions', value: artwork.dimensions },
           ].map(({ label, value }) => (
             <div key={label} style={{
-              display: 'flex', gap: 'var(--space-md)', alignItems: 'center',
+              display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', alignItems: 'center',
               padding: '0.7rem 0', borderBottom: '1px solid var(--color-line)',
             }}>
               <span className="label" style={{ minWidth: 90 }}>{label}</span>
@@ -154,6 +156,17 @@ export default function FeaturedExhibition() {
           View Full Work →
         </button>
       </div>
+
+      {/* Below 860px: stack image above content instead of squeezing two
+          columns. Image gets a capped height so it doesn't dominate the
+          screen on mobile. */}
+      <style>{`
+        @media (max-width: 860px) {
+          .featured-section { grid-template-columns: 1fr !important; }
+          .featured-image { aspect-ratio: 4/3 !important; }
+          .featured-image img { aspect-ratio: 4/3 !important; }
+        }
+      `}</style>
     </section>
   );
 }

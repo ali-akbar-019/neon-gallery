@@ -32,13 +32,16 @@
   --t-label:        0.7rem;
 
   /* — Spacing rhythm — */
+  /* lg/xl/2xl scale down fluidly on narrow viewports so section gaps and
+     margins don't eat the whole screen on mobile — e.g. space-2xl was a
+     fixed 10rem (160px) which is a huge, wasteful gap on a 375px phone. */
   --space-2xs: 0.4rem;
   --space-xs:  0.75rem;
   --space-sm:  1.25rem;
   --space-md:  2.25rem;
-  --space-lg:  4rem;
-  --space-xl:  7rem;
-  --space-2xl: 10rem;
+  --space-lg:  clamp(2.5rem, 5vw, 4rem);
+  --space-xl:  clamp(3.5rem, 8vw, 7rem);
+  --space-2xl: clamp(4.5rem, 11vw, 10rem);
 
   --section-px: clamp(1.5rem, 6vw, 6rem);
   --section-py: clamp(4.5rem, 9vw, 8rem);

@@ -68,7 +68,7 @@ export default function Hero() {
   };
 
   return (
-    <section style={{
+    <section className="hero-section" style={{
       position: 'relative',
       minHeight: '100vh',
       display: 'grid',
@@ -78,13 +78,14 @@ export default function Hero() {
       overflow: 'hidden',
     }}>
       {/* Left — type column */}
-      <div style={{
+      <div className="hero-text-col" style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: 'clamp(5rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+        padding: 'clamp(5rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem)',
         position: 'relative',
         zIndex: 2,
+        minWidth: 0,
       }}>
         <p ref={labelRef} className="label" style={{ color: 'var(--color-rust)', marginBottom: 'var(--space-md)', opacity: 0 }}>
           Current Exhibition — Spring 2025
@@ -108,7 +109,7 @@ export default function Hero() {
           collection for work that lives only on screens — open day and night, no ticket required.
         </p>
 
-        <div ref={ctaRef} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', opacity: 0 }}>
+        <div ref={ctaRef} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-md)', opacity: 0 }}>
           <button
             onClick={scrollToGallery}
             style={{
@@ -134,8 +135,8 @@ export default function Hero() {
         </div>
 
         {/* Quiet meta row — gallery hours, like a real gallery footer-of-hero */}
-        <div ref={metaRef} style={{
-          display: 'flex', gap: 'var(--space-lg)', marginTop: 'var(--space-2xl)', opacity: 0,
+        <div ref={metaRef} className="hero-meta-row" style={{
+          display: 'flex', flexWrap: 'wrap', gap: 'var(--space-lg)', marginTop: 'var(--space-2xl)', opacity: 0,
         }}>
           {[
             ['Hours', 'Always open'],
@@ -150,14 +151,18 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Right — single artwork crop, quiet and large, like a gallery poster */}
+      {/* Right — single artwork crop, quiet and large, like a gallery poster.
+          On tablet/mobile this drops below the text and becomes a fixed-height
+          band instead of squeezing into a useless sliver. */}
       <div
         ref={imageRef}
+        className="hero-image-col"
         style={{
           position: 'relative',
           opacity: 0,
           overflow: 'hidden',
           borderLeft: '1px solid var(--color-line)',
+          minHeight: 320,
         }}
       >
         <img
@@ -187,6 +192,27 @@ export default function Hero() {
           </p>
         </div>
       </div>
+
+      {/* Responsive: below 900px, stack into a single column. The image
+          becomes a fixed-height band under the text instead of a crushed
+          sliver, and minHeight:100vh is dropped so the section doesn't
+          force extra empty space once content determines its own height. */}
+      <style>{`
+        @media (max-width: 900px) {
+          .hero-section {
+            grid-template-columns: 1fr !important;
+            min-height: 0 !important;
+          }
+          .hero-image-col {
+            min-height: 360px !important;
+            border-left: none !important;
+            border-top: 1px solid var(--color-line) !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .hero-meta-row { gap: var(--space-md) !important; }
+        }
+      `}</style>
     </section>
   );
 }

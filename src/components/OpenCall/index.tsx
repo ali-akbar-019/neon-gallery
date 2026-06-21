@@ -85,12 +85,12 @@ export default function OpenCall() {
         <h2 ref={headingRef} style={{ opacity: 0 }}>Submit your work.</h2>
       </div>
 
-      <div style={{
+      <div className="opencall-grid" style={{
         display: 'grid', gridTemplateColumns: '1fr 1.3fr',
         gap: 'clamp(3rem, 6vw, 6rem)', alignItems: 'start',
       }}>
         {/* Left — info */}
-        <div ref={leftRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', opacity: 0 }}>
+        <div ref={leftRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', opacity: 0, minWidth: 0 }}>
           <p className="body-lg">
             Wall accepts submissions from digital artists worldwide. We are especially
             interested in work that sits at the edge of the recognizable — images that
@@ -166,7 +166,7 @@ export default function OpenCall() {
               background: 'var(--color-surface)', border: '1px solid var(--color-line)',
               padding: 'clamp(1.75rem, 4vw, 2.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-md)',
             }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-sm)' }}>
+              <div className="opencall-name-email" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-sm)' }}>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>Full Name *</label>
                   <input type="text" placeholder="Kira Nakamura" value={form.name}
@@ -238,6 +238,18 @@ export default function OpenCall() {
           )}
         </div>
       </div>
+      {/* Below 860px: stack the info column above the form instead of
+          squeezing 1fr/1.3fr columns. Below 520px: name/email fields
+          stack too, since two inputs side by side get too narrow to use
+          comfortably on small phones. */}
+      <style>{`
+        @media (max-width: 860px) {
+          .opencall-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 520px) {
+          .opencall-name-email { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

@@ -87,18 +87,25 @@ export default function ArtistSpotlight() {
         </h2>
       </div>
 
-      {/* Asymmetric gallery-wall grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 'var(--space-md)',
-      }}>
+      {/* Asymmetric gallery-wall grid — collapses 4 → 2 → 1 columns.
+          The "tall" span-2 trick only makes visual sense with at least 2
+          columns side by side, so it's dropped entirely on single-column
+          mobile (handled via the .makers-card-tall class below). */}
+      <div
+        className="makers-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 'var(--space-md)',
+        }}
+      >
         {artists.map((artist, i) => {
           const tall = SPAN[i] === 'tall';
           return (
             <div
               key={artist.id}
               ref={(el) => { cardsRef.current[i] = el; }}
+              className={tall ? 'makers-card makers-card-tall' : 'makers-card'}
               style={{
                 gridRow: tall ? 'span 2' : 'span 1',
                 background: 'var(--color-surface)',
@@ -106,6 +113,7 @@ export default function ArtistSpotlight() {
                 display: 'flex',
                 flexDirection: 'column',
                 opacity: 0,
+                minWidth: 0,
                 transition: 'border-color 0.3s ease, transform 0.3s ease',
                 cursor: 'pointer',
               }}
@@ -121,12 +129,15 @@ export default function ArtistSpotlight() {
               }}
             >
               {/* Photo */}
-              <div style={{
-                position: 'relative',
-                aspectRatio: tall ? '3/4' : '4/3',
-                overflow: 'hidden',
-                borderBottom: '1px solid var(--color-line)',
-              }}>
+              <div
+                className="makers-card-photo"
+                style={{
+                  position: 'relative',
+                  aspectRatio: tall ? '3/4' : '4/3',
+                  overflow: 'hidden',
+                  borderBottom: '1px solid var(--color-line)',
+                }}
+              >
                 <img
                   src={artist.imageUrl}
                   alt={artist.name}
@@ -145,7 +156,7 @@ export default function ArtistSpotlight() {
               </div>
 
               {/* Content */}
-              <div style={{ padding: 'var(--space-sm)', display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <div style={{ padding: 'var(--space-sm)', display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
                 <p className="label" style={{ color: 'var(--color-rust)', marginBottom: '0.4rem' }}>
                   {artist.specialty}
                 </p>
@@ -178,6 +189,21 @@ export default function ArtistSpotlight() {
           );
         })}
       </div>
+
+      {/* Responsive collapse: 4 columns → 2 (tablet) → 1 (mobile).
+          On single-column mobile, the span-2 "tall" trick is dropped
+          (it doesn't read as a salon hang with only one column) and
+          every photo uses the same aspect ratio for a clean, even list. */}
+      <style>{`
+        @media (max-width: 1000px) {
+          .makers-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 560px) {
+          .makers-grid { grid-template-columns: 1fr !important; }
+          .makers-card-tall { grid-row: span 1 !important; }
+          .makers-card-photo { aspect-ratio: 4/3 !important; }
+        }
+      `}</style>
     </section>
   );
 }
